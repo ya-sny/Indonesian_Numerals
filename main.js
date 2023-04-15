@@ -1,4 +1,19 @@
-// const digit = ["", "", "puluh", "ratus", "ribu", "puluh ribu", "ratus ribu", "juta", "puluh juta", "ratus juta", "milyar", "trilyun"];
+const { createApp } = Vue
+createApp({
+	data() {
+		return {
+			num: ""
+		}
+	},
+	computed: {
+		translate : function(){
+			const number = this.num.replace(/[^0-9]/g, "");
+			return number.length !== 1 ?
+				convertToIndonesian(number) : ["nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan"][number];
+		}
+	}
+}).mount('#app');
+
 const ones = {
 	"0" : "",
 	"1" : "se",
@@ -12,36 +27,18 @@ const ones = {
 	"9" : "sembilan "
 };
 
-const { createApp } = Vue
-createApp({
-	data() {
-		return {
-			num: ""
-		}
-	},
-	computed: {
-		translate : function(){
-			if (this.num.length === 1)
-				return ["nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan"][parseInt(this.num)];
-			return convertToIndonesian(this.num);
-		}
-	}
-}).mount('#app');
-
 function convertToIndonesian(number){
 	const integer = parseInt(number);
 	const digit = number.length;
 
+	if (integer > 10 && integer < 20)
+		return ones[number[1]] + "belas ";
 	if (number[0] === "0" && number.length > 1)
 		return convertToIndonesian(number.slice(1));
 	switch (digit){
 		case 1:
-			if (number !== "1")
-				return ones[number];
-			return "satu";
+			return integer !== 1 ? ones[integer] : "satu";
 		case 2:
-			if (integer > 10 && integer < 20)
-				return ones[number[1]] + "belas ";
 			return ones[number[0]] + "puluh " + convertToIndonesian(number.slice(1));
 		case 3:
 			return ones[number[0]] + "ratus " + convertToIndonesian(number.slice(1));
@@ -52,13 +49,23 @@ function convertToIndonesian(number){
 		case 6:
 			return convertToIndonesian(number.substring(0, 3)) + "ribu " + convertToIndonesian("0" + number.substring(3));
 		case 7:
-			if (number[0] !== "1")
-				return convertToIndonesian(number.substring(0, 1)) + "juta " + convertToIndonesian(number.substring(1));
-			return "sejuta " + convertToIndonesian(number.substring(1));
+			return ones[number[0]] + "juta " + convertToIndonesian(number.substring(1));
 		case 8:
 			return convertToIndonesian(number.substring(0, 2)) + "juta " + convertToIndonesian(number.substring(2));
 		case 9:
 			return convertToIndonesian(number.substring(0, 3)) + "juta " + convertToIndonesian("0" + number.substring(3));
+		case 10:
+			return (number[0] !== "1" ? ones[number[0]] + "milyar " : "satu milyar ") + convertToIndonesian(number.slice(1));
+		case 11:
+			return convertToIndonesian(number.substring(0, 2)) + "milyar " + convertToIndonesian(number.substring(2));
+		case 12:
+			return convertToIndonesian(number.substring(0, 3)) + "milyar " + convertToIndonesian("0" + number.substring(3));
+		case 13:
+			return (number[0] !== "1" ? ones[number[0]] + "trilyun " : "satu trilyun ") + convertToIndonesian(number.slice(1));
+		case 14:
+			return convertToIndonesian(number.substring(0, 2)) + "trilyun " + convertToIndonesian(number.substring(2));
+		case 15:
+			return convertToIndonesian(number.substring(0, 3)) + "trilyun " + convertToIndonesian("0" + number.substring(3));
 	}
-	return "fooo";
+	return "";
 }
