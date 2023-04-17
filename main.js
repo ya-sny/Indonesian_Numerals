@@ -31,10 +31,10 @@ function convertToIndonesian(number){
 	const integer = parseInt(number);
 	const digit = number.length;
 
-	if (integer > 10 && integer < 20)
-		return ones[number[1]] + "belas ";
 	if (number[0] === "0" && number.length > 1)
 		return convertToIndonesian(number.slice(1));
+	if (integer > 10 && integer < 20)
+		return ones[number[1]] + "belas ";
 	switch (digit){
 		case 1:
 			return integer !== 1 ? ones[integer] : "satu";
@@ -67,5 +67,5 @@ function convertToIndonesian(number){
 		case 15:
 			return convertToIndonesian(number.substring(0, 3)) + "trilyun " + convertToIndonesian("0" + number.substring(3));
 	}
-	return "";
+	return "null";
 }
